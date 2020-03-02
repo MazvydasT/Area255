@@ -1,0 +1,168 @@
+﻿<Window x:Class="ProcessSimulateImportConditioner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ProcessSimulateImportConditioner"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="Area 255" Height="350" Width="525" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Icon="reddit-alien-brands.ico">
+    <Window.Resources>
+        <Style BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" TargetType="Button"/>
+        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <local:BaseOutputDirectoryValidityConverter x:Key="BaseOutputDirectoryValidityConverter"/>
+        <local:GoButtonVisibilityConverter x:Key="GoButtonVisibilityConverter"/>
+        <local:SysRootToVisibilityConverter x:Key="SysRootToVisibilityConverter"/>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+        <Viewbox x:Key="RocketIcon">
+            <Canvas Width="512" Height="512">
+                <Path Fill="Black" Data="M505.12019 19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716 0 435.507 0 410.40747 0 307.17523 0 245.26909 55.20312 199.05238 128H94.83772c-16.34763.01562-35.55658 11.875-42.88664 26.48438L2.51562 253.29688A28.4 28.4 0 0 0 0 264a24.00867 24.00867 0 0 0 24.00582 24H127.81618l-22.47457 22.46875c-11.36521 11.36133-12.99607 32.25781 0 45.25L156.24582 406.625c11.15623 11.1875 32.15619 13.15625 45.27726 0l22.47457-22.46875V488a24.00867 24.00867 0 0 0 24.00581 24 28.55934 28.55934 0 0 0 10.707-2.51562l98.72834-49.39063c14.62888-7.29687 26.50776-26.5 26.50776-42.85937V312.79688c72.59753-46.3125 128.03493-108.40626 128.03493-211.09376C512.07526 76.5 512.07526 51.29688 505.12019 19.09375ZM384.04033 168A40 40 0 1 1 424.05 128 40.02322 40.02322 0 0 1 384.04033 168Z" Stretch="Uniform"/>
+            </Canvas>
+        </Viewbox>
+
+        <Viewbox x:Key="FileImportIcon">
+            <Canvas Width="512" Height="512">
+                <Path Fill="Black" Data="M16,288C7.2,288,0,295.2,0,304L0,336C0,344.8,7.2,352,16,352L128,352 128,288z M505,105L407.1,7C402.6,2.5,396.5,0,390.1,0L384,0 384,128 512,128 512,121.9C512,115.6,509.5,109.5,505,105z M352,136L352,0 152,0C138.7,0,128,10.7,128,24L128,288 256,288 256,222.8C256,208.5,273.3,201.4,283.4,211.5L379,308C385.6,314.7,385.6,325.4,379,332L283.3,428.4C273.2,438.5,255.9,431.4,255.9,417.1L255.9,352 128,352 128,488C128,501.3,138.7,512,152,512L488,512C501.3,512,512,501.3,512,488L512,160 376,160C362.8,160,352,149.2,352,136z" Stretch="Uniform"/>
+            </Canvas>
+        </Viewbox>
+
+        <Viewbox x:Key="FolderOpenIcon" x:Shared="False">
+            <Canvas Width="512" Height="512">
+                <Path Fill="Black" Data="M527.9,224L480,224 480,176C480,149.5,458.5,128,432,128L272,128 208,64 48,64C21.5,64,0,85.5,0,112L0,400C0,426.5,21.5,448,48,448L448,448C464.5,448,479.9,439.5,488.7,425.4L568.6,297.4C588.6,265.5,565.6,224,527.9,224z M48,118C48,114.7,50.7,112,54,112L188.1,112 252.1,176 426,176C429.3,176,432,178.7,432,182L432,224 152,224C135.2,224,119.6,232.8,110.9,247.2L48,351.4z M448,400L72,400 149.2,272 528,272z" Stretch="Uniform"/>
+            </Canvas>
+        </Viewbox>
+    </Window.Resources>
+
+    <Grid>
+        <local:UFOLoadBar Visibility="{Binding MaxValue, Converter={StaticResource CountToVisibilityConverter}}"/>
+        <Grid>
+            <Grid.Visibility>
+                <Binding Path="MaxValue" Converter="{StaticResource CountToVisibilityConverter}">
+                    <Binding.ConverterParameter>
+                        <sys:Boolean>True</sys:Boolean>
+                    </Binding.ConverterParameter>
+                </Binding>
+            </Grid.Visibility>
+            
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Run Text="Siemens "/>
+            <Run Text="{Binding ConverterExeName, Mode=OneWay}"/>
+            <Run Text=" not found. Please add it to PATH environment variable."/>
+            <TextBlock.Visibility>
+                <Binding Path="SysRootPath" Converter="{StaticResource SysRootToVisibilityConverter}" Mode="OneWay">
+                    <Binding.ConverterParameter>
+                        <sys:Boolean>True</sys:Boolean>
+                    </Binding.ConverterParameter>
+                </Binding>
+            </TextBlock.Visibility>
+        </TextBlock>
+            <DockPanel Visibility="{Binding SysRootPath, Converter={StaticResource SysRootToVisibilityConverter}, Mode=OneWay}" Margin="10">
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Visibility="{Binding Path=Visibility, ElementName=buttonGo}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <CheckBox IsChecked="{Binding MergeOutput, UpdateSourceTrigger=PropertyChanged}" Content="Merge output"/>
+                        <CheckBox x:Name="UsePartNameCheckBox" IsChecked="{Binding UsePartName, UpdateSourceTrigger=PropertyChanged}" Content="Use part name for output folder"/>
+                    </StackPanel>
+                    <Button Content="{StaticResource FileImportIcon}" x:Name="buttonAdd" Click="Button_Click_1" Width="30" Height="30" HorizontalAlignment="Left" Margin="0,5"/>
+                    <Button Content="{StaticResource RocketIcon}" x:Name="buttonGo" Width="40" Height="40" HorizontalAlignment="Right" Click="buttonGo_Click" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Column="2">
+                        <Button.Visibility>
+                            <MultiBinding Converter="{StaticResource GoButtonVisibilityConverter}">
+                                <Binding Path="InputsCount" Mode="OneWay"/>
+                                <Binding Path="InvalidOutputDirectoryCount" Mode="OneWay"/>
+                                <Binding Path="BaseOutputDirectoryIsValid" Mode="OneWay"/>
+                            </MultiBinding>
+                        </Button.Visibility>
+                    </Button>
+                </Grid>
+
+                <StackPanel Margin="0,10,0,0" DockPanel.Dock="Bottom" Visibility="{Binding AutoOutputCount, Converter={StaticResource CountToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Auto output folder: "/>
+                    <TextBlock Foreground="OrangeRed" TextTrimming="CharacterEllipsis">
+                        <Run Text="{Binding PathUnderSysRootMessage, Mode=OneWay}"/>
+                        <TextBlock.Visibility>
+                            <Binding Path="BaseOutputDirectoryIsValid" Converter="{StaticResource BooleanToVisibilityConverter}">
+                                <Binding.ConverterParameter>
+                                    <sys:Boolean>True</sys:Boolean>
+                                </Binding.ConverterParameter>
+                            </Binding>
+                        </TextBlock.Visibility>
+                    </TextBlock>
+                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="{StaticResource FolderOpenIcon}" x:Name="autoOutputDirectoryBrowseButton" Margin="10,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="22" Width="22" Grid.Column="2" Click="autoOutputDirectoryBrowseButton_Click"/>
+                    <TextBox Text="{Binding BaseOutputDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="AutoOutputBaseDirectoryTextBox" Grid.Column="0" FontStyle="Italic" IsReadOnly="True">
+                        <TextBox.Background>
+                            <MultiBinding Converter="{StaticResource BaseOutputDirectoryValidityConverter}">
+                                <Binding Path="AutoOutputCount" Mode="OneWay"/>
+                                <Binding Path="BaseOutputDirectoryIsValid" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBox.Background>
+                    </TextBox>
+                </Grid>
+            </StackPanel>
+            
+            <DataGrid x:Name="inputsView" CanUserAddRows="False" CanUserReorderColumns="False" CanUserDeleteRows="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" HeadersVisibility="None" VerticalGridLinesBrush="{x:Null}" HorizontalScrollBarVisibility="Hidden" BorderBrush="{x:Null}" SelectionMode="Single" ItemsSource="{Binding Inputs}" Background="{x:Null}" AutoGenerateColumns="False" EnableRowVirtualization="False" ScrollViewer.CanContentScroll="False">
+                <DataGrid.Resources>
+                    <ResourceDictionary>
+                        <Style x:Key="{x:Type DataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="Background" Value="{x:Null}" />
+                            <Setter Property="BorderBrush" Value="{x:Null}" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{x:Null}" />
+                                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        <Style TargetType="{x:Type DataGridRow}">
+                            <Setter Property="Background" Value="{x:Null}" />
+                            <Setter Property="BorderBrush" Value="{x:Null}" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{x:Null}" />
+                                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ResourceDictionary>
+                </DataGrid.Resources>
+                <DataGrid.HorizontalGridLinesBrush>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <LinearGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                                <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                <RotateTransform Angle="90" CenterY="0.5" CenterX="0.5"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </LinearGradientBrush.RelativeTransform>
+                        <GradientStop Color="#3F000000" Offset="0.15"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                        <GradientStop Color="#00000000"/>
+                        <GradientStop Color="#3F000000" Offset="0.85"/>
+                    </LinearGradientBrush>
+                </DataGrid.HorizontalGridLinesBrush>
+                
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn CanUserReorder="False" CanUserResize="False" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:InputItemView></local:InputItemView>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+        </Grid>
+    </Grid>
+</Window>

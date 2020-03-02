@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="ProcessSimulateImportConditioner.UFOLoadBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ProcessSimulateImportConditioner"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:UFOProgressBarConverter x:Key="UFOProgressBarConverter"/>
+
+        <Viewbox x:Key="SaucerIcon">
+            <Canvas Height="94.17522" Width="188.14279">
+                <Path Fill="Black" Data="m 50.601814 167.97849 c -2.056153 -3.13808 -1.051882 -6.76891 2.424012 -8.76381 1.858401 -1.06656 3.366491 -3.1998 4.669815 -6.60557 3.156257 -8.24785 3.277507 -8.09756 -8.017081 -9.93788 C 24.497867 138.56832 8.8220429 131.74177 8.8220429 124.8789 c 0 -6.69815 15.2000551 -13.78441 37.6285611 -17.54241 3.363046 -0.5635 7.025342 -1.22413 8.138404 -1.46807 1.223299 -0.26809 3.132498 -2.40807 4.826851 -5.4103 5.763703 -10.212685 19.519955 -20.283387 31.718676 -23.220637 6.031937 -1.452386 17.485905 -1.452386 23.517845 0 12.19872 2.93725 25.95496 13.007952 31.71867 23.220637 1.69435 3.00223 3.60352 5.14221 4.82682 5.4103 1.11308 0.24399 4.77536 0.90457 8.13841 1.46807 22.21953 3.72299 37.62856 10.90294 37.62856 17.53332 0 6.87231 -15.6618 13.69625 -40.85653 17.80142 -8.2179 1.339 -9.94203 1.90501 -9.94203 3.26377 0 2.45257 3.89319 12.15913 4.8769 12.15913 1.6091 0 5.47097 4.61802 5.47097 6.54224 0 2.75888 -3.31543 5.68704 -6.43921 5.68704 -3.52908 0 -5.79007 -2.65182 -5.79007 -6.79085 0 -2.5402 -1.19869 -5.02413 -4.95783 -10.27376 l -4.95783 -6.9236 -31.40402 -0.0309 -31.404047 -0.0309 -5.029565 6.80099 c -4.055699 5.4841 -5.029538 7.51098 -5.029538 10.46807 0 4.43275 -2.216977 6.78085 -6.40222 6.78085 -2.118633 0 -3.398864 -0.66742 -4.498006 -2.34492 z m 77.199816 -45.1277 c 7.97274 -1.52541 13.25018 -3.72045 14.06781 -5.85113 0.85854 -2.2373 -1.21727 -8.77917 -4.34856 -13.70447 C 128.8796 89.703104 111.65689 81.83778 96.607421 84.610768 81.523795 87.390023 67.750023 98.957229 64.394438 111.66322 c -1.28807 4.8773 -0.71198 6.40203 3.102845 8.21228 10.504744 4.98481 41.745567 6.52618 60.304347 2.97529 z" Stretch="Uniform"/>
+            </Canvas>
+        </Viewbox>
+    </UserControl.Resources>
+    <Grid x:Name="loaderRoot">
+        <Grid x:Name="barWidthSource" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <Grid.Width>
+                <MultiBinding Converter="{StaticResource UFOProgressBarConverter}" NotifyOnTargetUpdated="True">
+                    <Binding ElementName="loaderRoot" Path="ActualWidth" Mode="OneWay"/>
+                    <Binding Path="MaxValue" Mode="OneWay"/>
+                    <Binding Path="ProgressValue" Mode="OneWay"/>
+                </MultiBinding>
+            </Grid.Width>
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="barContainer" Storyboard.TargetProperty="Width" To="{Binding Path=ActualWidth, ElementName=barWidthSource, Mode=OneWay, NotifyOnTargetUpdated=True}" Duration="{Binding ProgressAnimationDuration}">
+                                <DoubleAnimation.EasingFunction>
+                                    <SineEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Grid.Triggers>
+        </Grid>
+        <Grid Width="0" x:Name="barContainer" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <Grid RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" Height="10">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                        <GradientStop Color="#00FFFFFF"/>
+                        <GradientStop Color="LimeGreen" Offset="0.5"/>
+                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform Y="{Binding Path=Y, ElementName=saucerTranslation}"/>
+                        <ScaleTransform ScaleY="{Binding Path=ScaleX, ElementName=saucerScale}"/>
+                    </TransformGroup>
+                </Grid.RenderTransform>
+            </Grid>
+            <Canvas x:Name="saucerCanvas" Width="75" Height="75" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Margin="0,0,-55,0">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform x:Name="saucerRotation" Angle="0"/>
+                        <TranslateTransform x:Name="saucerTranslation" X="0" Y="0"/>
+                        <ScaleTransform x:Name="saucerScale" ScaleX="1" ScaleY="{Binding Path=ScaleX, RelativeSource={RelativeSource Self}}"/>
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+                <Canvas.Triggers>
+                    <EventTrigger RoutedEvent="Canvas.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                            		    Storyboard.TargetName="saucerRotation"
+                            		    Storyboard.TargetProperty="Angle"
+                            		    From="9" To="14" Duration="0:0:0.4"
+                            		    AutoReverse="True" RepeatBehavior="Forever"/>
+
+                                <DoubleAnimation
+                            		    Storyboard.TargetName="saucerTranslation"
+                            		    Storyboard.TargetProperty="Y"
+                            		    From="-2" To="5" Duration="0:0:0.7"
+                            		    AutoReverse="True" RepeatBehavior="Forever"/>
+
+                                <DoubleAnimation
+                            		    Storyboard.TargetName="saucerTranslation"
+                            		    Storyboard.TargetProperty="X"
+                            		    From="-3" To="3" Duration="0:0:1.5"
+                            		    AutoReverse="True" RepeatBehavior="Forever" />
+
+                                <DoubleAnimation
+                            		    Storyboard.TargetName="saucerScale"
+                            		    Storyboard.TargetProperty="ScaleX"
+                            		    From="0.9" To="1.1" Duration="0:0:5"
+                            		    AutoReverse="True" RepeatBehavior="Forever" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Canvas.Triggers>
+                <ContentPresenter Width="{Binding ElementName=saucerCanvas, Mode=OneWay, Path=ActualWidth}" Height="{Binding ElementName=saucerCanvas, Mode=OneWay, Path=ActualHeight}" Content="{StaticResource SaucerIcon}"/>
+            </Canvas>
+        </Grid>
+    </Grid>
+</UserControl>

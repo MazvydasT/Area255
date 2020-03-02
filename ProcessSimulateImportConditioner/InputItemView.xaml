@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="ProcessSimulateImportConditioner.InputItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             xmlns:local="clr-namespace:ProcessSimulateImportConditioner"
+             d:DesignHeight="300" d:DesignWidth="500">
+    <UserControl.Resources>
+        <local:NegateBooleanConverter x:Key="NegateBooleanConverter"/>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:OutputDirectoryConverter x:Key="OutputDirectoryConverter"/>
+        <local:OutputDirectoryValidityConverter x:Key="OutputDirectoryValidityConverter"/>
+        <local:OddEvenBackgroundConverter x:Key="OddEvenBackgroundConverter"/>
+
+        <Viewbox x:Key="TrashCanIcon">
+            <Canvas Width="512" Height="512">
+                <Path Fill="Black" Data="M268,416L292,416A12,12,0,0,0,304,404L304,188A12,12,0,0,0,292,176L268,176A12,12,0,0,0,256,188L256,404A12,12,0,0,0,268,416z M432,80L349.59,80 315.59,23.3A48,48,0,0,0,274.41,0L173.59,0A48,48,0,0,0,132.43,23.3L98.41,80 16,80A16,16,0,0,0,0,96L0,112A16,16,0,0,0,16,128L32,128 32,464A48,48,0,0,0,80,512L368,512A48,48,0,0,0,416,464L416,128 432,128A16,16,0,0,0,448,112L448,96A16,16,0,0,0,432,80z M171.84,50.91A6,6,0,0,1,177,48L271,48A6,6,0,0,1,276.15,50.91L293.61,80 154.39,80z M368,464L80,464 80,128 368,128z M156,416L180,416A12,12,0,0,0,192,404L192,188A12,12,0,0,0,180,176L156,176A12,12,0,0,0,144,188L144,404A12,12,0,0,0,156,416z"/>
+            </Canvas>
+        </Viewbox>
+    </UserControl.Resources>
+    <Grid Background="{Binding Index, Mode=OneWay, Converter={StaticResource OddEvenBackgroundConverter}}" VerticalAlignment="Top" Margin="0,5" Grid.Column="1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="24"/>
+            <RowDefinition Height="*" MinHeight="24"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock VerticalAlignment="Center" Text="Input:" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+        <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding JTPath}" FontStyle="Italic" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"/>
+            
+        <StackPanel Grid.Column="4" Grid.ColumnSpan="1" Margin="10,0,5,5">
+            <RadioButton GroupName="{Binding Index}" Content="Part" IsChecked="{Binding PartClass, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <RadioButton GroupName="{Binding Index}" Content="Resource" IsChecked="{Binding ResourceClass, Mode=OneWay}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Column="1" Text="Output directory:" VerticalAlignment="Center" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+        <CheckBox Grid.Row="1" IsChecked="{Binding AutoOutputDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Auto" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,5,0" />
+        <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
+            <TextBox Background="{Binding OutputDirectoryIsValid, Converter={StaticResource OutputDirectoryValidityConverter}, Mode=OneWay}" x:Name="customOutputDirectory" TextChanged="customOutputDirectory_TextChanged" FontStyle="Italic" IsReadOnly="True">
+                <TextBox.Visibility>
+                    <Binding Path="AutoOutputDirectory" Converter="{StaticResource BooleanToVisibilityConverter}" Mode="OneWay">
+                        <Binding.ConverterParameter>
+                            <sys:Boolean>True</sys:Boolean>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </TextBox.Visibility>
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource OutputDirectoryConverter}">
+                        <Binding Path="AutoOutputDirectory" Mode="OneWay"/>
+                        <Binding ElementName="AutoOutputBaseDirectoryTextBox" Path="Text" Mode="OneWay"/>
+                        <Binding Path="Index" Mode="OneWay"/>
+                        <Binding Path="OutputDirectory" Mode="OneWay"/>
+                        <Binding ElementName="UsePartNameCheckBox" Path="IsChecked" Mode="OneWay"/>
+                        <Binding Path="PartName" Mode="OneWay"/>
+                        <Binding Mode="OneWay"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBlock Visibility="{Binding AutoOutputDirectory, Converter={StaticResource BooleanToVisibilityConverter}}" TextTrimming="CharacterEllipsis" Text="{Binding OutputDirectory, Mode=OneWay}" FontStyle="Italic"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="2">
+            <TextBlock TextTrimming="CharacterEllipsis" Foreground="OrangeRed" Text="{Binding ElementName=inputsView, Path=DataContext.PathUnderSysRootMessage, Mode=OneWay}">
+                <TextBlock.Visibility>
+                    <Binding Path="OutputDirectoryIsValid" Converter="{StaticResource BooleanToVisibilityConverter}">
+                        <Binding.ConverterParameter>
+                            <sys:Boolean>True</sys:Boolean>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </TextBlock.Visibility>
+            </TextBlock>
+            <TextBlock TextTrimming="CharacterEllipsis" Foreground="OrangeRed" Text="Directory contents may get overwritten">
+                <TextBlock.Visibility>
+                    <Binding Path="OutputDirectoryIsEmpty" Converter="{StaticResource BooleanToVisibilityConverter}">
+                        <Binding.ConverterParameter>
+                            <sys:Boolean>True</sys:Boolean>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </TextBlock.Visibility>
+            </TextBlock>
+        </StackPanel>
+        <Button Content="{DynamicResource FolderOpenIcon}" Grid.Row="1" x:Name="browseCustomOutputDir" Grid.Column="3" VerticalAlignment="Center" Height="22" Width="22" Click="browseCustomOutputDir_Click" Margin="10,0,0,0">
+            <Button.Visibility>
+                <Binding Path="AutoOutputDirectory" Converter="{StaticResource BooleanToVisibilityConverter}">
+                    <Binding.ConverterParameter>
+                        <sys:Boolean>True</sys:Boolean>
+                    </Binding.ConverterParameter>
+                </Binding>
+            </Button.Visibility>
+        </Button>
+        <Button Content="{StaticResource TrashCanIcon}" Grid.RowSpan="2" VerticalAlignment="Center" Width="22" Height="22" Margin="0,0,10,0" Click="Button_Click_1"/>
+    </Grid>
+</UserControl>

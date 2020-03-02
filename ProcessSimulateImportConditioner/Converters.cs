@@ -1,0 +1,192 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace ProcessSimulateImportConditioner
+{
+    public class NegateBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+    }
+
+    public class OddEvenBackgroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (int)value % 2 == 0 ? null : new SolidColorBrush(Utils.GreyColour);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SysRootToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var sysRootPath = (string)value;
+            var sysRootPathIsEmpty = sysRootPath == String.Empty;
+
+            var invert = parameter == null ? false : (bool)parameter;
+
+            if (invert)
+                sysRootPathIsEmpty = !sysRootPathIsEmpty;
+
+            return sysRootPathIsEmpty ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+    }
+
+    public class CountToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var moreThanZero = System.Convert.ToDouble(value) > 0;
+            var invert = parameter == null ? false : (bool)parameter;
+
+            if (invert) moreThanZero = !moreThanZero;
+
+            return moreThanZero ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BooleanToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var val = (bool)value;
+            var invert = parameter == null ? false : (bool)parameter;
+
+            if(invert) val = !val;
+
+            return val ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OutputDirectoryValidityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (bool)value ? Brushes.White : new SolidColorBrush(Utils.WarningColour);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OutputDirectoryConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var autoOutputDirectory = (bool)values[0];
+            var autoOutputBaseDirectory = (string)values[1];
+            var index = (int)values[2];
+            var outputDirectory = (string)values[3];
+            var usePartName = (bool)values[4];
+            var partName = (string)values[5];
+            var input = (Input)values[6];
+
+            string path;
+
+            if (autoOutputDirectory)
+            {
+                var duplicatePathIndex = usePartName ? 0 : index;
+
+                path = Path.Combine(autoOutputBaseDirectory, usePartName ? partName : index.ToString());
+
+                while (ApplicationData.Service.InputsContainMoreThanOneOutputPath(path, input) || !Utils.DirectoryIsEmpty(path))
+                {
+                    var newDuplicatePathIndex = (++duplicatePathIndex).ToString();
+
+                    path = Path.Combine(autoOutputBaseDirectory, usePartName ? partName + " " + newDuplicatePathIndex : newDuplicatePathIndex);
+                }
+            }
+
+            else
+                path = outputDirectory;
+
+            return Utils.PathIsValid(path) || !autoOutputDirectory ? path : "";
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+
+    public class BaseOutputDirectoryValidityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (int)values[0] == 0 || (bool)values[1] ? Brushes.White : new SolidColorBrush(Utils.WarningColour);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+
+    public class GoButtonVisibilityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (int)values[0] > 0 && (int)values[1] == 0 && (bool)values[2] ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+
+    public class UFOProgressBarConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var progressBarWidth = ((double)values[0]) * (((double)values[2]) / ((double)values[1]));
+
+            progressBarWidth = Double.IsNaN(progressBarWidth) || Double.IsInfinity(progressBarWidth) ? 0 : progressBarWidth;
+
+            return progressBarWidth;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+}
