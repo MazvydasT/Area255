@@ -1,0 +1,8 @@
+﻿v1.1.1
+
+Disabled console window
+
+
+v1.1.0
+
+Tool no longer crashes when JT → COJT conversion fails, instead failed conversion files are logged and displayed to user.

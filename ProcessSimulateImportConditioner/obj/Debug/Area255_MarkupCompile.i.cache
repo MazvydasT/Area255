@@ -1,7 +1,7 @@
 ﻿Area255
 
 
-winexe
+exe
 C#
 .cs
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Debug\
@@ -12,9 +12,9 @@ DEBUG;TRACE
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\App.xaml
 3-76049095
 
-17-127411826
+18-2085135890
 13242005368
 InputItemView.xaml;MainWindow.xaml;UFOLoadBar.xaml;
 
-True
+False
 

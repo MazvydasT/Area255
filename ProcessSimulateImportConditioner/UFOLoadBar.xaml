@@ -8,6 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:UFOProgressBarConverter x:Key="UFOProgressBarConverter"/>
+        <local:LoadingBarColourConverter x:Key="LoadingBarColourConverter"/>
 
         <Viewbox x:Key="SaucerIcon">
             <Canvas Height="94.17522" Width="188.14279">
@@ -43,7 +44,7 @@
                 <Grid.Background>
                     <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
                         <GradientStop Color="#00FFFFFF"/>
-                        <GradientStop Color="LimeGreen" Offset="0.5"/>
+                        <GradientStop Color="{Binding Path=ErrorsCount, Converter={StaticResource LoadingBarColourConverter}, Mode=OneWay}" Offset="0.5"/>
                         <GradientStop Color="#00FFFFFF" Offset="1"/>
                     </LinearGradientBrush>
                 </Grid.Background>

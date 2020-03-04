@@ -31,6 +31,7 @@ namespace ProcessSimulateImportConditioner
         private void browseCustomOutputDir_Click(object sender, RoutedEventArgs e)
         {
             var folderBrowserDialog = new FolderSelectDialog();
+            folderBrowserDialog.Title = "Choose output directory";
 
             while (true)
             {
@@ -44,6 +45,8 @@ namespace ProcessSimulateImportConditioner
                     if (messageBoxResult == MessageBoxResult.Cancel) return;
                     if (messageBoxResult == MessageBoxResult.Yes) break;
                 }
+
+                else break;
             }
 
             ((Input)DataContext).OutputDirectory = folderBrowserDialog.FileName;

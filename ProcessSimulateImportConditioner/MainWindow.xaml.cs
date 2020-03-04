@@ -34,6 +34,7 @@ namespace ProcessSimulateImportConditioner
             InitializeComponent();
 
             DataContext = ApplicationData.Service;
+            ApplicationData.Service.GUIDispatcher = Dispatcher;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -41,7 +42,7 @@ namespace ProcessSimulateImportConditioner
             var openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = true;
             openFileDialog.Filter = "JT (*.jt)|*.jt";
-
+            openFileDialog.Title = "Select JT files";
 
             var openFileResult = openFileDialog.ShowDialog();
             if (openFileResult == System.Windows.Forms.DialogResult.Cancel) return;
@@ -69,6 +70,7 @@ namespace ProcessSimulateImportConditioner
         private void autoOutputDirectoryBrowseButton_Click(object sender, RoutedEventArgs e)
         {
             var folderBrowserDialog = new FolderSelectDialog();
+            folderBrowserDialog.Title = "Choose output directory";
 
             var openFolderResult = folderBrowserDialog.ShowDialog();
             if (!openFolderResult) return;
@@ -79,6 +81,8 @@ namespace ProcessSimulateImportConditioner
         private void buttonGo_Click(object sender, RoutedEventArgs e)
         {
             var service = ApplicationData.Service;
+
+            service.Errors.Clear();
 
             string mergedOutputFilePath = null;
 
@@ -101,33 +105,36 @@ namespace ProcessSimulateImportConditioner
             Task.WhenAll(ApplicationData.Service.Inputs.Select(input => Utils.ConvertInput(input).Task.ContinueWith(task =>
             {
                 var data = task.Result;
+                XElement xmlDocument = null;
 
-                var xmlDocument = data.Item1;
-                //string name = System.IO.Path.GetFileNameWithoutExtension(input.JTPath);
-
-                string compoundElementName = null;
-                string prototypeElementName = null;
-                string instanceElementName = null;
-
-                if (input.PartClass && xmlDocument.Descendants("PmCompoundPart").Count() == 0)
+                if (data != null)
                 {
-                    compoundElementName = "PmCompoundPart";
-                    prototypeElementName = "PmPartPrototype";
-                    instanceElementName = "PmPartInstance";
-                }
+                    xmlDocument = data.Item1;
+                    //string name = System.IO.Path.GetFileNameWithoutExtension(input.JTPath);
 
-                else if (input.ResourceClass && xmlDocument.Descendants("PmCompoundResource").Count() == 0)
-                {
-                    compoundElementName = "PmCompoundResource";
-                    prototypeElementName = "PmToolPrototype";
-                    instanceElementName = "PmToolInstance";
-                }
+                    string compoundElementName = null;
+                    string prototypeElementName = null;
+                    string instanceElementName = null;
 
-                if (compoundElementName != null)
-                {
-                    var instanceId = elementId++;
+                    if (input.PartClass && xmlDocument.Descendants("PmCompoundPart").Count() == 0)
+                    {
+                        compoundElementName = "PmCompoundPart";
+                        prototypeElementName = "PmPartPrototype";
+                        instanceElementName = "PmPartInstance";
+                    }
 
-                    var compoundElements = new object[]
+                    else if (input.ResourceClass && xmlDocument.Descendants("PmCompoundResource").Count() == 0)
+                    {
+                        compoundElementName = "PmCompoundResource";
+                        prototypeElementName = "PmToolPrototype";
+                        instanceElementName = "PmToolInstance";
+                    }
+
+                    if (compoundElementName != null)
+                    {
+                        var instanceId = elementId++;
+
+                        var compoundElements = new object[]
                     {
                         new XElement(instanceElementName, new object[]
                         {
@@ -143,18 +150,19 @@ namespace ProcessSimulateImportConditioner
                         })
                     };
 
-                    xmlDocument.Descendants("Objects").First().AddFirst(compoundElements);
-                }
+                        xmlDocument.Descendants("Objects").First().AddFirst(compoundElements);
+                    }
 
-                if (mergedOutputFilePath == null)
-                {
-                    Directory.CreateDirectory(input.OutputDirectory);
-                    xmlDocument.Save(System.IO.Path.Combine(input.OutputDirectory, data.Item2));
+                    if (mergedOutputFilePath == null)
+                    {
+                        Directory.CreateDirectory(input.OutputDirectory);
+                        xmlDocument.Save(System.IO.Path.Combine(input.OutputDirectory, data.Item2));
+                    }
                 }
 
                 service.ProgressValue++;
 
-                return new Tuple<XElement, string>(xmlDocument, input.PartName);
+                return data == null ? null : new Tuple<XElement, string>(xmlDocument, input.PartName);
             })))
             .ContinueWith(task =>
             {
@@ -167,6 +175,8 @@ namespace ProcessSimulateImportConditioner
 
                     foreach (var data in dataItems)
                     {
+                        if (data == null) continue;
+
                         var xmlDocument = data.Item1;
                         var name = data.Item2;
 

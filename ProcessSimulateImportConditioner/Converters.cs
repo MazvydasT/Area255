@@ -37,6 +37,19 @@ namespace ProcessSimulateImportConditioner
         }
     }
 
+    public class LoadingBarColourConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (int)value == 0 ? Utils.LimeGreen : Utils.OrangeRed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SysRootToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -164,7 +177,12 @@ namespace ProcessSimulateImportConditioner
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return (int)values[0] > 0 && (int)values[1] == 0 && (bool)values[2] ? Visibility.Visible : Visibility.Hidden;
+            var inputsCount = (int)values[0];
+            var invalidOutputDirectoryCount = (int)values[1];
+            var baseOutputDirectoryIsValid = (bool)values[2];
+            var autoOutputCount = (int)values[3];
+
+            return inputsCount > 0 && invalidOutputDirectoryCount == 0 && (baseOutputDirectoryIsValid || autoOutputCount == 0) ? Visibility.Visible : Visibility.Hidden;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

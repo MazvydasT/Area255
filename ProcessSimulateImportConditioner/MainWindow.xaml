@@ -32,6 +32,12 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
         <local:UFOLoadBar Visibility="{Binding MaxValue, Converter={StaticResource CountToVisibilityConverter}}"/>
         <Grid>
             <Grid.Visibility>
@@ -43,17 +49,17 @@
             </Grid.Visibility>
             
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Run Text="Siemens "/>
-            <Run Text="{Binding ConverterExeName, Mode=OneWay}"/>
-            <Run Text=" not found. Please add it to PATH environment variable."/>
-            <TextBlock.Visibility>
-                <Binding Path="SysRootPath" Converter="{StaticResource SysRootToVisibilityConverter}" Mode="OneWay">
-                    <Binding.ConverterParameter>
-                        <sys:Boolean>True</sys:Boolean>
-                    </Binding.ConverterParameter>
-                </Binding>
-            </TextBlock.Visibility>
-        </TextBlock>
+                <Run Text="Siemens "/>
+                <Run Text="{Binding ConverterExeName, Mode=OneWay}"/>
+                <Run Text=" not found. Please add it to PATH environment variable."/>
+                <TextBlock.Visibility>
+                    <Binding Path="SysRootPath" Converter="{StaticResource SysRootToVisibilityConverter}" Mode="OneWay">
+                        <Binding.ConverterParameter>
+                            <sys:Boolean>True</sys:Boolean>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </TextBlock.Visibility>
+            </TextBlock>
             <DockPanel Visibility="{Binding SysRootPath, Converter={StaticResource SysRootToVisibilityConverter}, Mode=OneWay}" Margin="10">
                 <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
@@ -72,6 +78,7 @@
                                 <Binding Path="InputsCount" Mode="OneWay"/>
                                 <Binding Path="InvalidOutputDirectoryCount" Mode="OneWay"/>
                                 <Binding Path="BaseOutputDirectoryIsValid" Mode="OneWay"/>
+                                <Binding Path="AutoOutputCount" Mode="OneWay"/>
                             </MultiBinding>
                         </Button.Visibility>
                     </Button>
@@ -164,5 +171,9 @@
             </DataGrid>
         </DockPanel>
         </Grid>
+
+        <GridSplitter Visibility="{Binding Path=ErrorsCount, Converter={StaticResource CountToVisibilityConverter}}" Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
+
+        <DataGrid Visibility="{Binding Path=ErrorsCount, Converter={StaticResource CountToVisibilityConverter}}" MinHeight="100" Grid.Row="2" CanUserAddRows="False" CanUserReorderColumns="False" CanUserDeleteRows="False" CanUserResizeRows="False" CanUserSortColumns="False" VerticalGridLinesBrush="{x:Null}" BorderBrush="{x:Null}" SelectionMode="Single" ItemsSource="{Binding Errors}" Background="{x:Null}" ScrollViewer.CanContentScroll="False" IsReadOnly="True"/>
     </Grid>
 </Window>

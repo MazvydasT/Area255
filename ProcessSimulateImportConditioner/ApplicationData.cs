@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -112,6 +113,9 @@ namespace ProcessSimulateImportConditioner
         private ObservableCollection<Input> inputs = new ObservableCollection<Input>();
         public ObservableCollection<Input> Inputs { get { return inputs; } }
 
+        private ObservableCollection<TranslationError> errors = new ObservableCollection<TranslationError>();
+        public ObservableCollection<TranslationError> Errors { get { return errors; } }
+
         private int autoOutputCount = 0;
         public int AutoOutputCount
         {
@@ -137,6 +141,21 @@ namespace ProcessSimulateImportConditioner
                 if (inputsCount != value)
                 {
                     inputsCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private int errorsCount = 0;
+        public int ErrorsCount
+        {
+            get { return errorsCount; }
+
+            set
+            {
+                if (errorsCount != value)
+                {
+                    errorsCount = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -258,9 +277,17 @@ namespace ProcessSimulateImportConditioner
         private Duration progressAnimationDuration = new Duration(new TimeSpan(0, 0, 0, 1, 500));
         public Duration ProgressAnimationDuration { get { return progressAnimationDuration; } }
 
+        public Dispatcher GUIDispatcher { get; set; }
+
         private ApplicationData()
         {
             Inputs.CollectionChanged += Inputs_CollectionChanged;
+            Errors.CollectionChanged += Errors_CollectionChanged;
+        }
+
+        void Errors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ErrorsCount = Errors.Count;
         }
 
         void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -272,17 +299,16 @@ namespace ProcessSimulateImportConditioner
                     input.PropertyChanged += input_PropertyChanged;
 
                     AutoOutputCount++;
-                    InputsCount++;
                 }
             }
 
             else
             {
-                InputsCount = Inputs.Count;
-
                 AutoOutputCount = Inputs.Where(input => input.AutoOutputDirectory).Count();
                 InvalidOutputDirectoryCount = Inputs.Where(input => !input.OutputDirectoryIsValid).Count();
             }
+
+            InputsCount = Inputs.Count;
 
             for (int i = 0, c = Inputs.Count; i < c; ++i)
                 Inputs[i].Index = i;

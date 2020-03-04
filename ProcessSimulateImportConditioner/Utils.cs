@@ -14,6 +14,8 @@ namespace ProcessSimulateImportConditioner
     public static class Utils
     {
         public static Color WarningColour { get { return Color.FromArgb(75, 255, 69, 0); } }
+        public static Color OrangeRed { get { return Colors.OrangeRed; } }
+        public static Color LimeGreen { get { return Colors.LimeGreen; } }
 
         public static Color GreyColour { get { return Color.FromArgb(35, 220, 220, 220); } }
 
@@ -57,7 +59,7 @@ namespace ProcessSimulateImportConditioner
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = ApplicationData.ConverterExeName,
-                    Arguments = String.Format("\"{0}\" -TxJT2cojt -extIdMod 3 {1} -dest \"{2}\" -output {3}", new object[] { input.JTPath, input.PartClass ? "" : "-emsClass defaultResource", tempDirectory, outputFileName }),
+                    Arguments = String.Format("\"{0}\" -TxJT2cojt -extIdMod 3 {1} -dest \"{2}\" -output \"{3}\"", new object[] { input.JTPath, input.PartClass ? "" : "-emsClass defaultResource", tempDirectory, outputFileName }),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -81,35 +83,55 @@ namespace ProcessSimulateImportConditioner
                         process.ErrorDataReceived -= processErrorDataReceived;
                         process.Exited -= processExited;
 
-                        var xmlDocument = XElement.Load(Path.Combine(tempDirectory, outputFileName));
-                        var fileNameElements = xmlDocument.Descendants("fileName").ToArray();
+                        var pathToXMLDocument = Path.Combine(tempDirectory, outputFileName);
 
-                        for (int i = 0, c = fileNameElements.Length; i < c; ++i)
+                        if (File.Exists(pathToXMLDocument))
                         {
-                            var fileNameElement = fileNameElements[i];
-                            
-                            var existingPath = fileNameElement.Value.TrimStart(new char[] { '#' });
+                            var xmlDocument = XElement.Load(pathToXMLDocument);
+                            var fileNameElements = xmlDocument.Descendants("fileName").ToArray();
 
-                            var existingFileName = Path.GetFileNameWithoutExtension(existingPath);
-                            var newFileName = i.ToString() + ".cojt";
+                            for (int i = 0, c = fileNameElements.Length; i < c; ++i)
+                            {
+                                var fileNameElement = fileNameElements[i];
 
-                            var newPath = Path.Combine(GetPathRelativeTo(input.OutputDirectory, ApplicationData.Service.SysRootPath).TrimStart(new char[] { Path.DirectorySeparatorChar }), newFileName);
+                                var existingPath = fileNameElement.Value.TrimStart(new char[] { '#' });
 
-                            fileNameElement.SetValue("#" + newPath);
+                                var existingFileName = Path.GetFileNameWithoutExtension(existingPath);
+                                var newFileName = i.ToString() + ".cojt";
 
-                            var outputCOJTDirectory = Path.Combine(input.OutputDirectory, newFileName);
+                                var newPath = Path.Combine(GetPathRelativeTo(input.OutputDirectory, ApplicationData.Service.SysRootPath).TrimStart(new char[] { Path.DirectorySeparatorChar }), newFileName);
 
-                            Directory.CreateDirectory(outputCOJTDirectory);
+                                fileNameElement.SetValue("#" + newPath);
 
-                            var existingJTFilePath = Path.Combine(existingPath, existingFileName + ".jt");
-                            var newJTFilePath = Path.Combine(outputCOJTDirectory, i.ToString() + ".jt");
+                                var outputCOJTDirectory = Path.Combine(input.OutputDirectory, newFileName);
 
-                            File.Copy(existingJTFilePath, newJTFilePath, true);
+                                Directory.CreateDirectory(outputCOJTDirectory);
+
+                                var existingJTFilePath = Path.Combine(existingPath, existingFileName + ".jt");
+                                var newJTFilePath = Path.Combine(outputCOJTDirectory, i.ToString() + ".jt");
+
+                                File.Copy(existingJTFilePath, newJTFilePath, true);
+                            }
+
+                            promise.TrySetResult(new Tuple<XElement, string>(xmlDocument, outputFileName));
+                        }
+
+                        else
+                        {
+                            ApplicationData.Service.GUIDispatcher.Invoke(() =>
+                            {
+                                ApplicationData.Service.Errors.Add(new TranslationError()
+                                {
+                                    Timestamp = DateTime.Now,
+                                    JTPath = input.JTPath,
+                                    Description = "Conversion failed"
+                                });
+                            });
+
+                            promise.TrySetResult(null);
                         }
 
                         Directory.Delete(tempDirectory, true);
-
-                        promise.TrySetResult(new Tuple<XElement, string>(xmlDocument, outputFileName));
                     };
 
                     process.OutputDataReceived += processOutputDataReceived;
