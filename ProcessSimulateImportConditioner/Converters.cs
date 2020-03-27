@@ -191,7 +191,7 @@ namespace ProcessSimulateImportConditioner
         }
     }
 
-    public class UFOProgressBarConverter : IMultiValueConverter
+    /*public class UFOProgressBarConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -200,6 +200,45 @@ namespace ProcessSimulateImportConditioner
             progressBarWidth = Double.IsNaN(progressBarWidth) || Double.IsInfinity(progressBarWidth) ? 0 : progressBarWidth;
 
             return progressBarWidth;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }*/
+
+    public class ProgressBarYTransformConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var mouseIsInsideLoader = (bool)values[0];
+            
+            if (!mouseIsInsideLoader) return 0d;
+
+            var yMousePositionInsideLoader = (double)values[1];
+            var loaderRootHalfHeight = (double)values[2]/2d;
+
+            return yMousePositionInsideLoader - loaderRootHalfHeight;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+
+    public class PointPercentageToPixelConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var percentagePoint = (Point)values[0];
+            var referenceWidth = (double)values[1];
+            var referenceHeight = (double)values[2];
+
+            var pixelPoint = new Point(referenceWidth * percentagePoint.X, referenceHeight * percentagePoint.Y);
+
+            return pixelPoint;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

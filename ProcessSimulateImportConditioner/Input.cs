@@ -63,7 +63,7 @@ namespace ProcessSimulateImportConditioner
             get
             {
                 if (partName == null)
-                    partName = Path.GetFileNameWithoutExtension(JTPath);
+                    partName = Path.GetFileNameWithoutExtension(JTPath).Trim();
 
                 return partName;
             }

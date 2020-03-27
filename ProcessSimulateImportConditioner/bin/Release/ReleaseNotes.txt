@@ -1,7 +1,21 @@
-﻿v1.1.1
+﻿v1.2.1
 
-Disabled console window
+Fixed bug causing crash if any of input JT file names ended with a space.
 
+###################################################################################################
+
+v1.2.0
+
+Fixed bug where translated .jt files are not in .cojt folder but rather in .cojt.tmp folder causing application to crash.
+Added counter showing how many of how many files are converted.
+
+###################################################################################################
+
+v1.1.1
+
+Disabled console window.
+
+###################################################################################################
 
 v1.1.0
 

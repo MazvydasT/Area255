@@ -6,18 +6,30 @@ using System.Windows.Media;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Windows.Threading;
 
 namespace ProcessSimulateImportConditioner
 {
     public static class Utils
     {
+        public static Dispatcher GUIDispatcher { get; set; }
+
         public static Color WarningColour { get { return Color.FromArgb(75, 255, 69, 0); } }
         public static Color OrangeRed { get { return Colors.OrangeRed; } }
         public static Color LimeGreen { get { return Colors.LimeGreen; } }
 
         public static Color GreyColour { get { return Color.FromArgb(35, 220, 220, 220); } }
+
+        private static Random random = new Random();
+        public static bool RandomBool { get { return random.Next(100) < 50; } }
+        public static double RandomDouble { get { return random.NextDouble(); } }
+
+        public static int RandomInt() { return random.Next(); }
+        public static int RandomInt(int max) { return random.Next(max); }
+        public static int RandomInt(int min, int max) { return random.Next(min, max); }
 
         public static string PartClassString { get { return "PmCompoundPart;PmPartPrototype;PmPartInstance"; } }
         public static string ResourceClassString { get { return "PmCompoundResource;PmResourcePrototype;PmResourceInstance"; } }
@@ -51,7 +63,7 @@ namespace ProcessSimulateImportConditioner
             var promise = new TaskCompletionSource<Tuple<XElement, string>>();
 
             var tempDirectory = NewTempDirectory;
-            //var outputFileName = new Regex("[^A-Za-z0-9]").Replace(Path.GetFileNameWithoutExtension(input.JTPath), "_") + ".xml";
+            
             var outputFileName = input.PartName + ".xml";
 
             var process = new Process()
@@ -108,6 +120,32 @@ namespace ProcessSimulateImportConditioner
                                 Directory.CreateDirectory(outputCOJTDirectory);
 
                                 var existingJTFilePath = Path.Combine(existingPath, existingFileName + ".jt");
+
+                                if (!File.Exists(existingJTFilePath))
+                                {
+                                    var existingJTFilePathTmp = Path.Combine(existingPath + ".tmp", existingFileName + ".jt");
+
+                                    if (!File.Exists(existingJTFilePathTmp))
+                                    {
+                                        Utils.GUIDispatcher.Invoke(() =>
+                                        {
+                                            ApplicationData.Service.Errors.Add(new TranslationError()
+                                            {
+                                                Timestamp = DateTime.Now,
+                                                JTPath = input.JTPath,
+                                                Description = String.Format("Conversion error: '{0}' not found.", existingJTFilePath)
+                                            });
+                                        });
+
+                                        continue;
+                                    }
+
+                                    else
+                                    {
+                                        existingJTFilePath = existingJTFilePathTmp;
+                                    }
+                                }
+
                                 var newJTFilePath = Path.Combine(outputCOJTDirectory, i.ToString() + ".jt");
 
                                 File.Copy(existingJTFilePath, newJTFilePath, true);
@@ -118,15 +156,15 @@ namespace ProcessSimulateImportConditioner
 
                         else
                         {
-                            ApplicationData.Service.GUIDispatcher.Invoke(() =>
-                            {
-                                ApplicationData.Service.Errors.Add(new TranslationError()
-                                {
-                                    Timestamp = DateTime.Now,
-                                    JTPath = input.JTPath,
-                                    Description = "Conversion failed"
-                                });
-                            });
+                            Utils.GUIDispatcher.Invoke(() =>
+                             {
+                                 ApplicationData.Service.Errors.Add(new TranslationError()
+                                 {
+                                     Timestamp = DateTime.Now,
+                                     JTPath = input.JTPath,
+                                     Description = "Conversion failed: XML file was not created."
+                                 });
+                             });
 
                             promise.TrySetResult(null);
                         }

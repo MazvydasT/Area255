@@ -7,8 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <local:UFOProgressBarConverter x:Key="UFOProgressBarConverter"/>
+        <!--<local:UFOProgressBarConverter x:Key="UFOProgressBarConverter"/>-->
         <local:LoadingBarColourConverter x:Key="LoadingBarColourConverter"/>
+        <local:ProgressBarYTransformConverter x:Key="ProgressBarYTransformConverter"/>
 
         <Viewbox x:Key="SaucerIcon">
             <Canvas Height="94.17522" Width="188.14279">
@@ -16,8 +17,24 @@
             </Canvas>
         </Viewbox>
     </UserControl.Resources>
-    <Grid x:Name="loaderRoot">
-        <Grid x:Name="barWidthSource" VerticalAlignment="Center" HorizontalAlignment="Left">
+    <Grid Background="Transparent" x:Name="loaderRoot" MouseEnter="loaderRoot_MouseEnter" MouseLeave="loaderRoot_MouseLeave">
+        <local:AsteroidField Visibility="Collapsed"/>
+        
+        <!--<Grid x:Name="barSource" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="translateTransformSource">
+                        <TranslateTransform.Y>
+                            <MultiBinding Converter="{StaticResource ProgressBarYTransformConverter}" NotifyOnTargetUpdated="True">
+                                <Binding Path="MouseIsInsideLoader" Mode="OneWay"/>
+                                <Binding Path="YMousePositionInsideLoader" Mode="OneWay"/>
+                                <Binding ElementName="loaderRoot" Path="ActualHeight" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TranslateTransform.Y>
+                    </TranslateTransform>
+                </TransformGroup>
+            </Grid.RenderTransform>
+            
             <Grid.Width>
                 <MultiBinding Converter="{StaticResource UFOProgressBarConverter}" NotifyOnTargetUpdated="True">
                     <Binding ElementName="loaderRoot" Path="ActualWidth" Mode="OneWay"/>
@@ -25,21 +42,26 @@
                     <Binding Path="ProgressValue" Mode="OneWay"/>
                 </MultiBinding>
             </Grid.Width>
+            
             <Grid.Triggers>
                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="barContainer" Storyboard.TargetProperty="Width" To="{Binding Path=ActualWidth, ElementName=barWidthSource, Mode=OneWay, NotifyOnTargetUpdated=True}" Duration="{Binding ProgressAnimationDuration}">
-                                <DoubleAnimation.EasingFunction>
-                                    <SineEase EasingMode="EaseOut"/>
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
+                            <DoubleAnimation DecelerationRatio="1" Storyboard.TargetName="barContainer" Storyboard.TargetProperty="Width" To="{Binding Path=ActualWidth, ElementName=barSource, Mode=OneWay}" Duration="{Binding ProgressAnimationDuration}"/>
+                            <DoubleAnimation DecelerationRatio="1" Storyboard.TargetName="barContainerTranslateTransform" Storyboard.TargetProperty="Y" To="{Binding Path=Y, ElementName=translateTransformSource, Mode=OneWay}" Duration="0:0:1"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
             </Grid.Triggers>
-        </Grid>
+        </Grid>-->
+            
         <Grid Width="0" x:Name="barContainer" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="barContainerTranslateTransform" Y="0"/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+            
             <Grid RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" Height="10">
                 <Grid.Background>
                     <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -98,5 +120,14 @@
                 <ContentPresenter Width="{Binding ElementName=saucerCanvas, Mode=OneWay, Path=ActualWidth}" Height="{Binding ElementName=saucerCanvas, Mode=OneWay, Path=ActualHeight}" Content="{StaticResource SaucerIcon}"/>
             </Canvas>
         </Grid>
+        
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Jokerman" FontSize="20">
+            <Run Text="{Binding ProgressValue}"/>
+            <Run Text="/"/>
+            <Run Text="{Binding MaxValue}"/>
+        </TextBlock>
+        
+        <!--<Button Content="+" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="20" Click="Button_Click_2"/>
+        <Button Content="-" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="20" Click="Button_Click_1"/>-->
     </Grid>
 </UserControl>

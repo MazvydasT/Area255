@@ -34,7 +34,7 @@ namespace ProcessSimulateImportConditioner
             InitializeComponent();
 
             DataContext = ApplicationData.Service;
-            ApplicationData.Service.GUIDispatcher = Dispatcher;
+            Utils.GUIDispatcher = Dispatcher;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

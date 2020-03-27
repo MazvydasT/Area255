@@ -1,5 +1,6 @@
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\bin\Release\Area255.exe
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\bin\Release\Area255.pdb
+C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\AsteroidField.g.cs
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\InputItemView.g.cs
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\MainWindow.g.cs
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\UFOLoadBar.g.cs
@@ -7,6 +8,7 @@ C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportCondition
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\GeneratedInternalTypeHelper.g.cs
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\Area255_MarkupCompile.cache
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\Area255_MarkupCompile.lref
+C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\AsteroidField.baml
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\InputItemView.baml
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\MainWindow.baml
 C:\Users\mtadara1\Desktop\MyFiles\Dev\C# Projects\ProcessSimulateImportConditioner\ProcessSimulateImportConditioner\obj\Release\UFOLoadBar.baml

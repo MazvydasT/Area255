@@ -63,11 +63,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Asteroid.cs" />
+    <Compile Include="AsteroidField.xaml.cs">
+      <DependentUpon>AsteroidField.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TranslationError.cs" />
     <Compile Include="UFOLoadBar.xaml.cs">
       <DependentUpon>UFOLoadBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Page Include="AsteroidField.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="InputItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

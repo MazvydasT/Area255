@@ -11,23 +11,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace ProcessSimulateImportConditioner
 {
     public class ApplicationData : INotifyPropertyChanged
     {
-        private static ApplicationData service = null;
-        public static ApplicationData Service
-        {
-            get
-            {
-                if (service == null)
-                    service = new ApplicationData();
-
-                return service;
-            }
-        }
+        private static ApplicationData service = new ApplicationData();
+        public static ApplicationData Service { get { return service; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -277,12 +267,61 @@ namespace ProcessSimulateImportConditioner
         private Duration progressAnimationDuration = new Duration(new TimeSpan(0, 0, 0, 1, 500));
         public Duration ProgressAnimationDuration { get { return progressAnimationDuration; } }
 
-        public Dispatcher GUIDispatcher { get; set; }
+        private bool mouseIsInsideLoader = false;
+        public bool MouseIsInsideLoader
+        {
+            get { return mouseIsInsideLoader; }
+            set
+            {
+                if (mouseIsInsideLoader != value)
+                {
+                    mouseIsInsideLoader = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private Point mousePositionInsideLoader = new Point();
+        public Point MousePositionInsideLoader
+        {
+            get { return mousePositionInsideLoader; }
+            set
+            {
+                if (mousePositionInsideLoader != value)
+                {
+                    mousePositionInsideLoader = value;
+                    YMousePositionInsideLoader = value.Y;
+
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private double yMousePositionInsideLoader = 0;
+        public double YMousePositionInsideLoader
+        {
+            get { return yMousePositionInsideLoader; }
+            set
+            {
+                if (yMousePositionInsideLoader != value)
+                {
+                    yMousePositionInsideLoader = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<Asteroid> asteroids = new ObservableCollection<Asteroid>();
+        public ObservableCollection<Asteroid> Asteroids { get { return asteroids; } }
 
         private ApplicationData()
         {
             Inputs.CollectionChanged += Inputs_CollectionChanged;
             Errors.CollectionChanged += Errors_CollectionChanged;
+
+            //#################
+
+            Asteroids.Add(new Asteroid());
         }
 
         void Errors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
