@@ -1,20 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FolderSelect;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using FolderSelect;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -28,10 +14,12 @@ namespace ProcessSimulateImportConditioner
             InitializeComponent();
         }
 
-        private void browseCustomOutputDir_Click(object sender, RoutedEventArgs e)
+        private void BrowseCustomOutputDir_Click(object sender, RoutedEventArgs e)
         {
-            var folderBrowserDialog = new FolderSelectDialog();
-            folderBrowserDialog.Title = "Choose output directory";
+            var folderBrowserDialog = new FolderSelectDialog
+            {
+                Title = "Choose output directory"
+            };
 
             while (true)
             {
@@ -52,7 +40,7 @@ namespace ProcessSimulateImportConditioner
             ((Input)DataContext).OutputDirectory = folderBrowserDialog.FileName;
         }
 
-        private void customOutputDirectory_TextChanged(object sender, TextChangedEventArgs e)
+        private void CustomOutputDirectory_TextChanged(object sender, TextChangedEventArgs e)
         {
             ((Input)DataContext).OutputDirectory = ((TextBox)sender).Text;
         }

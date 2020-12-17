@@ -72,7 +72,7 @@
                         <CheckBox x:Name="UsePartNameCheckBox" IsChecked="{Binding UsePartName, UpdateSourceTrigger=PropertyChanged}" Content="Use part name for output folder"/>
                     </StackPanel>
                     <Button Content="{StaticResource FileImportIcon}" x:Name="buttonAdd" Click="Button_Click_1" Width="30" Height="30" HorizontalAlignment="Left" Margin="0,5"/>
-                    <Button Content="{StaticResource RocketIcon}" x:Name="buttonGo" Width="40" Height="40" HorizontalAlignment="Right" Click="buttonGo_Click" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Column="2">
+                    <Button Content="{StaticResource RocketIcon}" x:Name="buttonGo" Width="40" Height="40" HorizontalAlignment="Right" Click="ButtonGo_Click" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Column="2">
                         <Button.Visibility>
                             <MultiBinding Converter="{StaticResource GoButtonVisibilityConverter}">
                                 <Binding Path="InputsCount" Mode="OneWay"/>
@@ -103,7 +103,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="{StaticResource FolderOpenIcon}" x:Name="autoOutputDirectoryBrowseButton" Margin="10,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="22" Width="22" Grid.Column="2" Click="autoOutputDirectoryBrowseButton_Click"/>
+                    <Button Content="{StaticResource FolderOpenIcon}" x:Name="autoOutputDirectoryBrowseButton" Margin="10,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="22" Width="22" Grid.Column="2" Click="AutoOutputDirectoryBrowseButton_Click"/>
                     <TextBox Text="{Binding BaseOutputDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="AutoOutputBaseDirectoryTextBox" Grid.Column="0" FontStyle="Italic" IsReadOnly="True">
                         <TextBox.Background>
                             <MultiBinding Converter="{StaticResource BaseOutputDirectoryValidityConverter}">

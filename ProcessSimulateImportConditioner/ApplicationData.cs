@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -7,16 +6,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ProcessSimulateImportConditioner
 {
     public class ApplicationData : INotifyPropertyChanged
     {
-        private static ApplicationData service = new ApplicationData();
+        private static readonly ApplicationData service = new ApplicationData();
         public static ApplicationData Service { get { return service; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,7 +39,7 @@ namespace ProcessSimulateImportConditioner
 
                     var dummyFilePath = Path.Combine(tempDir, "dummy.jt");
 
-                    using(var dummyFileStream = File.Create(dummyFilePath))
+                    using (var dummyFileStream = File.Create(dummyFilePath))
                     {
                         dummyFileStream.Write(Properties.Resources.dummy, 0, Properties.Resources.dummy.Length);
                     }
@@ -100,10 +97,10 @@ namespace ProcessSimulateImportConditioner
             }
         }
 
-        private ObservableCollection<Input> inputs = new ObservableCollection<Input>();
+        private readonly ObservableCollection<Input> inputs = new ObservableCollection<Input>();
         public ObservableCollection<Input> Inputs { get { return inputs; } }
 
-        private ObservableCollection<TranslationError> errors = new ObservableCollection<TranslationError>();
+        private readonly ObservableCollection<TranslationError> errors = new ObservableCollection<TranslationError>();
         public ObservableCollection<TranslationError> Errors { get { return errors; } }
 
         private int autoOutputCount = 0;
@@ -311,7 +308,7 @@ namespace ProcessSimulateImportConditioner
             }
         }
 
-        private ObservableCollection<Asteroid> asteroids = new ObservableCollection<Asteroid>();
+        private readonly ObservableCollection<Asteroid> asteroids = new ObservableCollection<Asteroid>();
         public ObservableCollection<Asteroid> Asteroids { get { return asteroids; } }
 
         private ApplicationData()
@@ -335,7 +332,7 @@ namespace ProcessSimulateImportConditioner
             {
                 foreach (var input in e.NewItems.Cast<Input>())
                 {
-                    input.PropertyChanged += input_PropertyChanged;
+                    input.PropertyChanged += Input_PropertyChanged;
 
                     AutoOutputCount++;
                 }
@@ -353,7 +350,7 @@ namespace ProcessSimulateImportConditioner
                 Inputs[i].Index = i;
         }
 
-        void input_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void Input_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "AutoOutputDirectory")
                 AutoOutputCount += ((Input)sender).AutoOutputDirectory ? 1 : -1;

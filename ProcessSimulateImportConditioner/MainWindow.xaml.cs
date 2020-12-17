@@ -1,26 +1,13 @@
-﻿using System;
+﻿using FolderSelect;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Xml.Linq;
-
-using FolderSelect;
-using System.Windows.Forms;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -39,10 +26,12 @@ namespace ProcessSimulateImportConditioner
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = true;
-            openFileDialog.Filter = "JT (*.jt)|*.jt";
-            openFileDialog.Title = "Select JT files";
+            var openFileDialog = new OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "JT (*.jt)|*.jt",
+                Title = "Select JT files"
+            };
 
             var openFileResult = openFileDialog.ShowDialog();
             if (openFileResult == System.Windows.Forms.DialogResult.Cancel) return;
@@ -67,10 +56,12 @@ namespace ProcessSimulateImportConditioner
             }
         }
 
-        private void autoOutputDirectoryBrowseButton_Click(object sender, RoutedEventArgs e)
+        private void AutoOutputDirectoryBrowseButton_Click(object sender, RoutedEventArgs e)
         {
-            var folderBrowserDialog = new FolderSelectDialog();
-            folderBrowserDialog.Title = "Choose output directory";
+            var folderBrowserDialog = new FolderSelectDialog
+            {
+                Title = "Choose output directory"
+            };
 
             var openFolderResult = folderBrowserDialog.ShowDialog();
             if (!openFolderResult) return;
@@ -78,7 +69,7 @@ namespace ProcessSimulateImportConditioner
             AutoOutputBaseDirectoryTextBox.Text = folderBrowserDialog.FileName;
         }
 
-        private void buttonGo_Click(object sender, RoutedEventArgs e)
+        private void ButtonGo_Click(object sender, RoutedEventArgs e)
         {
             var service = ApplicationData.Service;
 
@@ -88,8 +79,10 @@ namespace ProcessSimulateImportConditioner
 
             if (service.MergeOutput)
             {
-                var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "eM-Planner data (*.xml)|*.xml";
+                var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "eM-Planner data (*.xml)|*.xml"
+                };
 
                 var openFileResult = saveFileDialog.ShowDialog();
                 if (openFileResult == System.Windows.Forms.DialogResult.Cancel) return;
@@ -190,7 +183,7 @@ namespace ProcessSimulateImportConditioner
                         }
 
                         var elements = xmlDocument.Descendants("Objects").First().Elements();
-                        
+
                         var partPrototypes = elements.Where(element => element.Name == "PmPartPrototype");
                         var resourcePrototypes = elements.Where(element => element.Name == "PmToolPrototype");
 

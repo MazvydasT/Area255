@@ -17,7 +17,7 @@
             </Canvas>
         </Viewbox>
     </UserControl.Resources>
-    <Grid Background="Transparent" x:Name="loaderRoot" MouseEnter="loaderRoot_MouseEnter" MouseLeave="loaderRoot_MouseLeave">
+    <Grid Background="Transparent" x:Name="loaderRoot" MouseEnter="LoaderRoot_MouseEnter" MouseLeave="LoaderRoot_MouseLeave">
         <local:AsteroidField Visibility="Collapsed"/>
         
         <!--<Grid x:Name="barSource" VerticalAlignment="Center" HorizontalAlignment="Left">

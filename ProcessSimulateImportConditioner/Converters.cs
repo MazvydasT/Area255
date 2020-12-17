@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -57,7 +52,7 @@ namespace ProcessSimulateImportConditioner
             var sysRootPath = (string)value;
             var sysRootPathIsEmpty = sysRootPath == String.Empty;
 
-            var invert = parameter == null ? false : (bool)parameter;
+            var invert = parameter != null && (bool)parameter;
 
             if (invert)
                 sysRootPathIsEmpty = !sysRootPathIsEmpty;
@@ -76,7 +71,7 @@ namespace ProcessSimulateImportConditioner
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var moreThanZero = System.Convert.ToDouble(value) > 0;
-            var invert = parameter == null ? false : (bool)parameter;
+            var invert = parameter != null && (bool)parameter;
 
             if (invert) moreThanZero = !moreThanZero;
 
@@ -94,9 +89,9 @@ namespace ProcessSimulateImportConditioner
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var val = (bool)value;
-            var invert = parameter == null ? false : (bool)parameter;
+            var invert = parameter != null && (bool)parameter;
 
-            if(invert) val = !val;
+            if (invert) val = !val;
 
             return val ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -213,11 +208,11 @@ namespace ProcessSimulateImportConditioner
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var mouseIsInsideLoader = (bool)values[0];
-            
+
             if (!mouseIsInsideLoader) return 0d;
 
             var yMousePositionInsideLoader = (double)values[1];
-            var loaderRootHalfHeight = (double)values[2]/2d;
+            var loaderRootHalfHeight = (double)values[2] / 2d;
 
             return yMousePositionInsideLoader - loaderRootHalfHeight;
         }

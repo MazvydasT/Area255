@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Media;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+using System.Windows.Media;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -23,7 +19,7 @@ namespace ProcessSimulateImportConditioner
 
         public static Color GreyColour { get { return Color.FromArgb(35, 220, 220, 220); } }
 
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
         public static bool RandomBool { get { return random.Next(100) < 50; } }
         public static double RandomDouble { get { return random.NextDouble(); } }
 
@@ -63,7 +59,7 @@ namespace ProcessSimulateImportConditioner
             var promise = new TaskCompletionSource<Tuple<XElement, string>>();
 
             var tempDirectory = NewTempDirectory;
-            
+
             var outputFileName = input.PartName + ".xml";
 
             var process = new Process()
@@ -71,7 +67,7 @@ namespace ProcessSimulateImportConditioner
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = ApplicationData.ConverterExeName,
-                    Arguments = String.Format("\"{0}\" -TxJT2cojt -extIdMod 3 {1} -dest \"{2}\" -output \"{3}\"", new object[] { input.JTPath, input.PartClass ? "" : "-emsClass defaultResource", tempDirectory, outputFileName }),
+                    Arguments = string.Format("\"{0}\" -TxJT2cojt -extIdMod 3 {1} -dest \"{2}\" -output \"{3}\"", new object[] { input.JTPath, input.PartClass ? "" : "-emsClass defaultResource", tempDirectory, outputFileName }),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -80,16 +76,16 @@ namespace ProcessSimulateImportConditioner
                 EnableRaisingEvents = true
             };
 
-            try
+            if (process.Start())
             {
-                if (process.Start())
+                void processOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs) => Console.WriteLine(dataReceivedEventArgs.Data);
+
+                void processErrorDataReceived(object processObject, DataReceivedEventArgs dataReceivedEventArgs) => Console.Error.WriteLine(dataReceivedEventArgs.Data);
+
+                void processExited(object processObject, EventArgs exitedEventArguments)
                 {
-                    DataReceivedEventHandler processOutputDataReceived = (object sender, DataReceivedEventArgs dataReceivedEventArgs) => Console.WriteLine(dataReceivedEventArgs.Data);
 
-                    DataReceivedEventHandler processErrorDataReceived = (object processObject, DataReceivedEventArgs dataReceivedEventArgs) => Console.Error.WriteLine(dataReceivedEventArgs.Data);
-
-                    EventHandler processExited = null;
-                    processExited = (object processObject, EventArgs exitedEventArguments) =>
+                    try
                     {
                         process.OutputDataReceived -= processOutputDataReceived;
                         process.ErrorDataReceived -= processErrorDataReceived;
@@ -117,7 +113,25 @@ namespace ProcessSimulateImportConditioner
 
                                 var outputCOJTDirectory = Path.Combine(input.OutputDirectory, newFileName);
 
-                                Directory.CreateDirectory(outputCOJTDirectory);
+                                try
+                                {
+                                    Directory.CreateDirectory(outputCOJTDirectory);
+                                }
+
+                                catch(Exception e)
+                                {
+                                    GUIDispatcher.Invoke(() =>
+                                    {
+                                        ApplicationData.Service.Errors.Add(new TranslationError()
+                                        {
+                                            Timestamp = DateTime.Now,
+                                            JTPath = outputCOJTDirectory,
+                                            Description = e.Message
+                                        });
+                                    });
+
+                                    throw new Exception();
+                                }
 
                                 var existingJTFilePath = Path.Combine(existingPath, existingFileName + ".jt");
 
@@ -127,7 +141,7 @@ namespace ProcessSimulateImportConditioner
 
                                     if (!File.Exists(existingJTFilePathTmp))
                                     {
-                                        Utils.GUIDispatcher.Invoke(() =>
+                                        GUIDispatcher.Invoke(() =>
                                         {
                                             ApplicationData.Service.Errors.Add(new TranslationError()
                                             {
@@ -148,7 +162,23 @@ namespace ProcessSimulateImportConditioner
 
                                 var newJTFilePath = Path.Combine(outputCOJTDirectory, i.ToString() + ".jt");
 
-                                File.Copy(existingJTFilePath, newJTFilePath, true);
+                                try
+                                {
+                                    File.Copy(existingJTFilePath, newJTFilePath, true);
+                                }
+
+                                catch (Exception e)
+                                {
+                                    GUIDispatcher.Invoke(() =>
+                                    {
+                                        ApplicationData.Service.Errors.Add(new TranslationError()
+                                        {
+                                            Timestamp = DateTime.Now,
+                                            JTPath = existingJTFilePath,
+                                            Description = e.Message
+                                        });
+                                    });
+                                }
                             }
 
                             promise.TrySetResult(new Tuple<XElement, string>(xmlDocument, outputFileName));
@@ -156,7 +186,7 @@ namespace ProcessSimulateImportConditioner
 
                         else
                         {
-                            Utils.GUIDispatcher.Invoke(() =>
+                            GUIDispatcher.Invoke(() =>
                              {
                                  ApplicationData.Service.Errors.Add(new TranslationError()
                                  {
@@ -166,24 +196,42 @@ namespace ProcessSimulateImportConditioner
                                  });
                              });
 
-                            promise.TrySetResult(null);
+                            throw new Exception();
                         }
 
-                        Directory.Delete(tempDirectory, true);
-                    };
 
-                    process.OutputDataReceived += processOutputDataReceived;
-                    process.ErrorDataReceived += processErrorDataReceived;
-                    process.Exited += processExited;
+                    }
 
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
+                    catch (Exception)
+                    {
+                        /*GUIDispatcher.Invoke(() =>
+                        {
+                            ApplicationData.Service.Errors.Add(new TranslationError()
+                            {
+                                Timestamp = DateTime.Now,
+                                Description = exception.Message
+                            });
+                        });*/
+
+                        promise.TrySetResult(null);
+                    }
+
+                    finally
+                    {
+                        if (Directory.Exists(tempDirectory))
+                        {
+                            try { Directory.Delete(tempDirectory, true); }
+                            catch (Exception) { }
+                        }
+                    }
                 }
-            }
 
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine(exception.Data);
+                process.OutputDataReceived += processOutputDataReceived;
+                process.ErrorDataReceived += processErrorDataReceived;
+                process.Exited += processExited;
+
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
 
             return promise;
@@ -199,7 +247,7 @@ namespace ProcessSimulateImportConditioner
 
         public static bool PathsAreSame(string path1, string path2)
         {
-            if(!PathIsValid(path1) || !PathIsValid(path2)) return false;
+            if (!PathIsValid(path1) || !PathIsValid(path2)) return false;
 
             var dirInfo1 = new DirectoryInfo(path1);
             var dirInfo2 = new DirectoryInfo(path2);
@@ -227,8 +275,7 @@ namespace ProcessSimulateImportConditioner
 
         public static bool PathIsSubpathOf(string subPath, string parentPath)
         {
-            string matchingDirectoryPath;
-            return PathIsSubpathOf(subPath, parentPath, out matchingDirectoryPath);
+            return PathIsSubpathOf(subPath, parentPath, out _);
         }
 
         public static bool PathIsSubpathOf(string subPath, string parentPath, out string matchingDirectoryPath)
@@ -245,7 +292,7 @@ namespace ProcessSimulateImportConditioner
 
             for (int i = subPathParts.Length - 1; i > -1; --i)
             {
-                var path = String.Join(Path.DirectorySeparatorChar.ToString(), subPathParts.Take(i + 1));
+                var path = string.Join(Path.DirectorySeparatorChar.ToString(), subPathParts.Take(i + 1));
 
                 if (PathsAreSame(parentPath, path))
                 {
@@ -253,16 +300,15 @@ namespace ProcessSimulateImportConditioner
                     return true;
                 }
             }
-            
+
             matchingDirectoryPath = null;
             return false;
         }
 
         public static string GetPathRelativeTo(string subPath, string parentPath)
         {
-            string matchingDirectoryPath;
 
-            if(!PathIsSubpathOf(subPath, parentPath, out matchingDirectoryPath)) return null;
+            if (!PathIsSubpathOf(subPath, parentPath, out string matchingDirectoryPath)) return null;
 
             return subPath.Substring(matchingDirectoryPath.Length);
         }

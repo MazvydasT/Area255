@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ProcessSimulateImportConditioner
@@ -13,9 +9,11 @@ namespace ProcessSimulateImportConditioner
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+
         // This method is called by the Set accessor of each property.  
         // The CallerMemberName attribute that is applied to the optional propertyName  
         // parameter causes the property name of the caller to be substituted as an argument.  
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             if (PropertyChanged != null)
@@ -24,7 +22,7 @@ namespace ProcessSimulateImportConditioner
             }
         }
 
-        private double rotationTo = Utils.RandomBool ? 360d : -360d;
+        private readonly double rotationTo = Utils.RandomBool ? 360d : -360d;
         public double RotationTo { get { return rotationTo; } }
 
         private Duration oneRevolutionDurantion = new Duration(new TimeSpan(0, 0, 0, 0, Utils.RandomInt(2000, 10000)));
@@ -63,7 +61,7 @@ namespace ProcessSimulateImportConditioner
             }
         }
 
-        private double trajectoryPassThroughPointRatio = Utils.RandomDouble; //0.5;
+        private readonly double trajectoryPassThroughPointRatio = Utils.RandomDouble; //0.5;
         public double TrajectoryPassThroughPointRatio { get { return trajectoryPassThroughPointRatio; } }
 
         private Point trajectoryPassThroughPoint = /*new Point(0.5, 0.5);*/ new Point(Utils.RandomDouble, Utils.RandomDouble);

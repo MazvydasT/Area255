@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -29,15 +20,15 @@ namespace ProcessSimulateImportConditioner
 
         void UFOLoadBar_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if((bool)e.NewValue)
+            if ((bool)e.NewValue)
                 CompositionTarget.Rendering += CompositionTarget_Rendering;
             else
                 CompositionTarget.Rendering -= CompositionTarget_Rendering;
         }
 
-        private Nullable<double> previousProgressValue = null;
+        private double? previousProgressValue = null;
         private double animationStartTimeMS = 0;
-        private double previousRenderingTimeS = -1;
+        // private double previousRenderingTimeS = -1;
         private PathGeometry pathGeometry = null;
         void CompositionTarget_Rendering(object sender, EventArgs e)
         {
@@ -99,29 +90,28 @@ namespace ProcessSimulateImportConditioner
             var animationTimeRatio = Math.Min((renderingTimeMS - animationStartTimeMS) / progressAnimationDurationMS, 1);
 
             Point point = new Point();
-            Point tangent;
 
             if (pathGeometry.Bounds.Width > 0)
             {
-                pathGeometry.GetPointAtFractionLength(animationTimeRatio, out point, out tangent);
+                pathGeometry.GetPointAtFractionLength(animationTimeRatio, out point, out _);
             }
 
             barContainer.Width = ActualWidth * point.X;
         }
 
-        private void loaderRoot_MouseEnter(object sender, MouseEventArgs e)
+        private void LoaderRoot_MouseEnter(object sender, MouseEventArgs e)
         {
-            loaderRoot.MouseMove += loaderRoot_MouseMove;
+            loaderRoot.MouseMove += LoaderRoot_MouseMove;
             ApplicationData.Service.MouseIsInsideLoader = true;
         }
 
-        private void loaderRoot_MouseLeave(object sender, MouseEventArgs e)
+        private void LoaderRoot_MouseLeave(object sender, MouseEventArgs e)
         {
             ApplicationData.Service.MouseIsInsideLoader = false;
-            loaderRoot.MouseMove -= loaderRoot_MouseMove;
+            loaderRoot.MouseMove -= LoaderRoot_MouseMove;
         }
 
-        void loaderRoot_MouseMove(object sender, MouseEventArgs e)
+        void LoaderRoot_MouseMove(object sender, MouseEventArgs e)
         {
             ApplicationData.Service.MousePositionInsideLoader = Mouse.GetPosition((IInputElement)sender);
         }

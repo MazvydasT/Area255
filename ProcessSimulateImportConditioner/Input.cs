@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ProcessSimulateImportConditioner
 {
@@ -16,7 +12,7 @@ namespace ProcessSimulateImportConditioner
         // This method is called by the Set accessor of each property.  
         // The CallerMemberName attribute that is applied to the optional propertyName  
         // parameter causes the property name of the caller to be substituted as an argument.  
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")  
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             if (PropertyChanged != null)
             {
@@ -126,7 +122,7 @@ namespace ProcessSimulateImportConditioner
             }
         }
         public bool ResourceClass { get { return !partClass; } }
-        
+
         private Nullable<bool> outputDirectoryIsValid = null;
         public bool OutputDirectoryIsValid
         {

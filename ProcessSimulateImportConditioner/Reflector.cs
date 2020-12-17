@@ -15,8 +15,8 @@ namespace FolderSelect
     {
         #region variables
 
-        string m_ns;
-        Assembly m_asmb;
+        readonly string m_ns;
+        readonly Assembly m_asmb;
 
         #endregion
 
